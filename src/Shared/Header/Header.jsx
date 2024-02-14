@@ -7,22 +7,125 @@ import { MdOutlineClose } from "react-icons/md";
 const navItems = [
   {
     route: "Home",
+    submenu: [
+      {
+        route: "Web Design Agency",
+        link: "/",
+      },
+      {
+        route: "Find Developers",
+        link: "/",
+      },
+      {
+        route: "Personal Portfolio",
+        link: "/",
+        type: "gray",
+      },
+      {
+        route: "back",
+        type: "gray",
+      },
+    ],
   },
   {
     route: "Pages",
-    link: "/",
+    submenu: [
+      {
+        route: "About",
+        link: "/",
+      },
+      {
+        route: "Services",
+        link: "/",
+      },
+      {
+        route: "Service Details",
+        link: "/",
+      },
+      {
+        route: "Team",
+        link: "/",
+      },
+      {
+        route: "Team Details",
+        link: "/",
+      },
+      {
+        route: "Career",
+        link: "/",
+      },
+      {
+        route: "Career Details",
+        link: "/",
+      },
+      {
+        route: "FAQ",
+        link: "/",
+      },
+      {
+        route: "back",
+        type: "gray",
+      },
+    ],
   },
   {
     route: "Portfolio",
-    link: "/",
+    submenu: [
+      {
+        route: "Portfolio",
+        link: "/",
+      },
+      {
+        route: "Portfolio Details",
+        link: "/",
+      },
+      {
+        route: "back",
+        type: "gray",
+      },
+    ],
   },
   {
     route: "Shop",
-    link: "/",
+    submenu: [
+      {
+        route: "Products",
+        link: "/",
+      },
+      {
+        route: "Single Product",
+        link: "/",
+      },
+      {
+        route: "Cart",
+        link: "/",
+      },
+      {
+        route: "Checkout",
+        link: "/",
+      },
+      {
+        route: "back",
+        type: "gray",
+      },
+    ],
   },
   {
     route: "News",
-    link: "/",
+    submenu: [
+      {
+        route: "News",
+        link: "/",
+      },
+      {
+        route: "News Details",
+        link: "/",
+      },
+      {
+        route: "back",
+        type: "gray",
+      },
+    ],
   },
   {
     route: "Contact",
@@ -65,6 +168,24 @@ const contactItmes = [
 ];
 const Header = () => {
   const [show, setShow] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [currentNavItems, setCurrentNavItems] = useState(navItems);
+
+  const handleNavItemChange = (index, route) => {
+    if (currentNavItems[index].submenu) {
+      setShowAnimation(true);
+      setTimeout(() => {
+        setCurrentNavItems(currentNavItems[index].submenu);
+        setShowAnimation(false);
+      }, 900);
+    } else if (route === "back") {
+      setShowAnimation(true);
+      setTimeout(() => {
+        setCurrentNavItems(navItems);
+        setShowAnimation(false);
+      }, 900);
+    }
+  };
 
   return (
     <header className="main-menu">
@@ -86,26 +207,39 @@ const Header = () => {
       </div>
 
       {/* dropdown menu */}
-      <ul className={`nav-items ${show ? "show show-nav-info" : "hide"}`}>
-        {navItems.map((item, index) => (
+      <ul
+        className={`nav-items ${show ? "show show-nav-info" : "hide"}`}
+        style={{
+          overflowY: `${currentNavItems?.length > 6 ? "scroll" : ""}`,
+          paddingTop: `${currentNavItems?.length > 6 ? "150px" : ""}`,
+        }}
+      >
+        {currentNavItems.map((item, index) => (
           <li key={item?.route}>
             <Link
-              to={item?.link}
+              onClick={() => handleNavItemChange(index, item?.route)}
+              to={item?.link ? item?.link : null}
               className={`link ${item?.class} ${
                 show ? "fade-up" : "fade-down"
-              }`}
+              } ${showAnimation ? "fade-down" : "fade-up"}`}
               style={{
                 animationDelay: `${
-                  show
+                  show && !showAnimation
                     ? `${0.3 + index * 0.1}s`
-                    : `${(navItems.length - index - 1) * 0.1 + 0.3}s`
+                    : `${(currentNavItems.length - index - 1) * 0.1 + 0.3}s`
                 }`,
+                color: `${item?.type ? "#666666" : ""}`,
               }}
             >
+              {item?.link && <span className="dot"></span>}
               {item?.route}{" "}
-              <span>
-                <FaArrowRight className="arrow-icon" />
-              </span>
+              {item?.link ? (
+                ""
+              ) : (
+                <span>
+                  <FaArrowRight className="arrow-icon" />
+                </span>
+              )}
             </Link>
           </li>
         ))}
@@ -116,13 +250,17 @@ const Header = () => {
         }`}
       >
         <div className="close-btn">
-          <MdOutlineClose className="close-icon"
+          <MdOutlineClose
+            className="close-icon"
             onClick={() => {
               setShow(false);
+              setTimeout(() => {
+                setCurrentNavItems(navItems);
+              }, 2000);
             }}
           />
         </div>
-        <ul>
+        <ul className="contact-info">
           {contactItmes.map((item, index) => (
             <li
               key={index}
@@ -140,8 +278,8 @@ const Header = () => {
                 <p>{item?.para_one}</p>
                 <p>{item?.para_two}</p>
                 <ul className="socials">
-                  {item?.socials.map((subItem) => (
-                    <li>
+                  {item?.socials.map((subItem, index) => (
+                    <li key={index}>
                       <FaArrowRight className="arrow" />
                       <Link className="social-links">{subItem?.route}</Link>
                     </li>
